@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import Entry from './components/Entry';
 
@@ -9,6 +9,7 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState('');
   const [pokemon, setPokemon] = useState([]);
+  const [results, setResults] = useState([]);
 
   const getData = async () => {
     setLoading(true);
@@ -22,20 +23,14 @@ const App = () => {
       .catch(console.error);
   };
 
-  const handleChange = (event) => {
-    const newValue = event.target.value;
-    setValue(newValue);
-    console.log(value);
-  };
-
-  /* const getPokemon = () => {
-    console.log(value);
-    const filteredResults = results.filter((pokemon) => {
-      pokemon.Name.startsWith(value);
-      console.log(pokemon.Name, value);
+  useEffect(() => {
+    const filteredResults = pokemon.filter((pokemon) => {
+      const name = pokemon.Name.toLowerCase();
+      return name.startsWith(value.toLowerCase());
     });
-  };
- */
+    setResults(filteredResults.slice(0, 4));
+  }, [pokemon]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <>
       <label htmlFor="maxCP" className="max-cp">
@@ -47,29 +42,31 @@ const App = () => {
         className="input"
         placeholder="Pokemon or type"
         value={value}
-        onChange={() => handleChange()}
-        // onInput={() => getData()}
+        onChange={(event) => {
+          getData();
+          setValue(event.target.value);
+        }}
       />
       {loading && <div className="loader"></div>}
       <ul className="suggestions">
-        {/*
-          map over the first 4 filtered suggestions, return:
+        {results.map((pokemon, index) => {
+          const { Name, Number, Types } = pokemon;
+          return (
+            <Entry name={Name} number={Number} types={Types} key={index} />
+          );
+        })}
 
-          <Entry
-            Name={pokemon.Name}
-            types={pokemon.types}
-            number={pokemon.number}
-          />
-        */}
-        <li>
-          <img
-            src="https://cyndiquil721.files.wordpress.com/2014/02/missingno.png"
-            alt=""
-          />
-          <div className="info">
-            <h1 className="no-results">No results</h1>
-          </div>
-        </li>
+        {results.length === 0 && (
+          <li>
+            <img
+              src="https://cyndiquil721.files.wordpress.com/2014/02/missingno.png"
+              alt=""
+            />
+            <div className="info">
+              <h1 className="no-results">No results</h1>
+            </div>
+          </li>
+        )}
       </ul>
     </>
   );

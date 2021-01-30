@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Entry = ({ Name, number, types }) => {
+const Entry = ({ name, number, types }) => {
   return (
     <li>
       <img
@@ -9,10 +9,14 @@ const Entry = ({ Name, number, types }) => {
       />
       <div className="info">
         <h1>
-          <span className="hl">{Name}</span>
+          <span className="hl">{name}</span>
         </h1>
-        {types.forEach((type) => {
-          return <span className={`type ${type.toLowerCase()}`}>{type}</span>;
+        {types.map((type, index) => {
+          return (
+            <span key={index} className={`type ${type.toLowerCase()}`}>
+              {type}
+            </span>
+          );
         })}
       </div>
     </li>
