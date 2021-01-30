@@ -19,6 +19,13 @@ const App = () => {
     data
       .json()
       .then((info) => {
+        info.sort((a, b) => {
+          if (maxCP) {
+            return a.MaxCP > b.MaxCP ? 1 : -1;
+          } else {
+            return a.Number > b.Number ? 1 : -1;
+          }
+        });
         setPokemon(info);
       })
       .catch(console.error);
