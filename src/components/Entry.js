@@ -1,6 +1,16 @@
 import React from 'react';
 
-const Entry = ({ name, number, types }) => {
+const Entry = ({ name, types, number, value }) => {
+  let title = <h1>{name}</h1>;
+  if (name.toLowerCase().startsWith(value.toLowerCase())) {
+    title = (
+      <h1>
+        <span className="hl">{name.slice(0, value.length)}</span>
+        {name.substring(value.length)}
+      </h1>
+    );
+  }
+
   return (
     <li>
       <img
@@ -8,9 +18,7 @@ const Entry = ({ name, number, types }) => {
         alt=""
       />
       <div className="info">
-        <h1>
-          <span className="hl">{name}</span>
-        </h1>
+        {title}
         {types.map((type, index) => {
           return (
             <span key={index} className={`type ${type.toLowerCase()}`}>

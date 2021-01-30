@@ -23,7 +23,7 @@ const App = () => {
           if (maxCP) {
             return a.MaxCP > b.MaxCP ? 1 : -1;
           } else {
-            return a.Number > b.Number ? 1 : -1;
+            return a.Name > b.Name ? 1 : -1;
           }
         });
         setPokemon(info);
@@ -36,7 +36,7 @@ const App = () => {
     const sortedPokemon = [...pokemon];
     sortedPokemon.sort((a, b) => {
       if (maxCP) {
-        return a.Number > b.Number ? 1 : -1;
+        return a.Name > b.Name ? 1 : -1;
       } else {
         return a.MaxCP > b.MaxCP ? 1 : -1;
       }
@@ -47,7 +47,12 @@ const App = () => {
   useEffect(() => {
     const filteredResults = pokemon.filter((pokemon) => {
       const name = pokemon.Name.toLowerCase();
-      return name.startsWith(value.toLowerCase());
+      const types = pokemon.Types.map((type) => type.toLowerCase());
+      types.map((type) => type.startsWith(value.toLowerCase()));
+      return (
+        name.startsWith(value.toLowerCase()) ||
+        types.some((type) => type.startsWith(value.toLowerCase()))
+      );
     });
     setResults(filteredResults.slice(0, 4));
   }, [pokemon]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -73,7 +78,13 @@ const App = () => {
         {results.map((pokemon, index) => {
           const { Name, Number, Types } = pokemon;
           return (
-            <Entry name={Name} number={Number} types={Types} key={index} />
+            <Entry
+              name={Name}
+              number={Number}
+              types={Types}
+              key={index}
+              value={value}
+            />
           );
         })}
 
