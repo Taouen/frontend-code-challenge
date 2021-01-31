@@ -5,16 +5,6 @@ import Entry from './components/Entry';
 const URL_PATH =
   'https://gist.githubusercontent.com/bar0191/fae6084225b608f25e98b733864a102b/raw/dea83ea9cf4a8a6022bfc89a8ae8df5ab05b6dcc/pokemon.json';
 
-/* 
-    To Do 
-    
-    - add a check for data, prevent fetch if it already exists
-    - add !response.ok handler
-    
-  
-  
- */
-
 const App = () => {
   const [pokemon, setPokemon] = useState([]);
   const [value, setValue] = useState('');
@@ -25,31 +15,26 @@ const App = () => {
   const getData = async () => {
     setLoading(true);
     const response = await fetch(URL_PATH);
-    if (!response.ok) {
-      const message = `An error has occured: ${response.status}`;
-      throw new Error(message);
-    }
     setLoading(false);
     response
       .json()
-      .then((info) => {
-        info.sort((a, b) => {
+      .then((data) => {
+        data.sort((a, b) => {
           if (!a.MaxCP) {
             a.MaxCP = '';
           }
           if (!b.MaxCP) {
             b.MaxCP = '';
           }
-
           if (maxCP) {
             return a.MaxCP > b.MaxCP ? -1 : 1;
           } else {
             return a.Name > b.Name ? 1 : -1;
           }
         });
-        setPokemon(info);
+        setPokemon(data);
       })
-      .catch(console.error);
+      .catch();
   };
 
   const sortByMaxCP = () => {
