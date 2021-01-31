@@ -5,6 +5,15 @@ import Entry from './components/Entry';
 const URL_PATH =
   'https://gist.githubusercontent.com/bar0191/fae6084225b608f25e98b733864a102b/raw/dea83ea9cf4a8a6022bfc89a8ae8df5ab05b6dcc/pokemon.json';
 
+/* 
+    To Do 
+    
+    - add a check for data, prevent fetch if it already exists
+    - add !response.ok handler
+  
+  
+ */
+
 const App = () => {
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState('');
@@ -14,9 +23,13 @@ const App = () => {
 
   const getData = async () => {
     setLoading(true);
-    const data = await fetch(URL_PATH);
+    const response = await fetch(URL_PATH);
     setLoading(false);
-    data
+    if (!response.ok) {
+      const message = `An error has occured: ${response.status}`;
+      throw new Error(message);
+    }
+    response
       .json()
       .then((info) => {
         info.sort((a, b) => {
@@ -45,15 +58,15 @@ const App = () => {
   };
 
   useEffect(() => {
-    const filteredResults = pokemon.filter((pokemon) => {
+    const filteredByName = pokemon.filter((pokemon) => {
       const name = pokemon.Name.toLowerCase();
-      const types = pokemon.Types.map((type) => type.toLowerCase());
-      types.map((type) => type.startsWith(value.toLowerCase()));
-      return (
-        name.startsWith(value.toLowerCase()) ||
-        types.some((type) => type.startsWith(value.toLowerCase()))
-      );
+      return name.startsWith(value.toLowerCase());
     });
+    const filteredByType = pokemon.filter((pokemon) => {
+      const types = pokemon.Types.map((type) => type.toLowerCase());
+      return types.some((type) => type.startsWith(value.toLowerCase()));
+    });
+    const filteredResults = [...filteredByName, ...filteredByType];
     setResults(filteredResults.slice(0, 4));
   }, [pokemon]); // eslint-disable-line react-hooks/exhaustive-deps
 
