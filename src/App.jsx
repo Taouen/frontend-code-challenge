@@ -10,31 +10,39 @@ const URL_PATH =
     
     - add a check for data, prevent fetch if it already exists
     - add !response.ok handler
+    
   
   
  */
 
 const App = () => {
-  const [loading, setLoading] = useState(false);
-  const [value, setValue] = useState('');
   const [pokemon, setPokemon] = useState([]);
+  const [value, setValue] = useState('');
   const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [maxCP, setMaxCP] = useState(false);
 
   const getData = async () => {
     setLoading(true);
     const response = await fetch(URL_PATH);
-    setLoading(false);
     if (!response.ok) {
       const message = `An error has occured: ${response.status}`;
       throw new Error(message);
     }
+    setLoading(false);
     response
       .json()
       .then((info) => {
         info.sort((a, b) => {
+          if (!a.MaxCP) {
+            a.MaxCP = '';
+          }
+          if (!b.MaxCP) {
+            b.MaxCP = '';
+          }
+
           if (maxCP) {
-            return a.MaxCP > b.MaxCP ? 1 : -1;
+            return a.MaxCP > b.MaxCP ? -1 : 1;
           } else {
             return a.Name > b.Name ? 1 : -1;
           }
@@ -44,14 +52,14 @@ const App = () => {
       .catch(console.error);
   };
 
-  const handleSortChange = () => {
+  const sortByMaxCP = () => {
     setMaxCP(!maxCP);
     const sortedPokemon = [...pokemon];
     sortedPokemon.sort((a, b) => {
       if (maxCP) {
         return a.Name > b.Name ? 1 : -1;
       } else {
-        return a.MaxCP > b.MaxCP ? 1 : -1;
+        return a.MaxCP > b.MaxCP ? -1 : 1;
       }
     });
     setPokemon(sortedPokemon);
@@ -68,12 +76,12 @@ const App = () => {
     });
     const filteredResults = [...filteredByName, ...filteredByType];
     setResults(filteredResults.slice(0, 4));
-  }, [pokemon]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pokemon, value]);
 
   return (
     <>
       <label htmlFor="maxCP" className="max-cp">
-        <input type="checkbox" id="maxCP" onChange={() => handleSortChange()} />
+        <input type="checkbox" id="maxCP" onChange={() => sortByMaxCP()} />
         <small>Maximum Combat Points</small>
       </label>
       <input
